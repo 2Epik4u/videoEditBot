@@ -47,12 +47,11 @@ bot = discord.AutoShardedClient(status=discord_status, intents=intents)
 class target_group:
     def __init__(self, attachments, reply, channel):
         self.attachments = attachments
-        self.reply = reply
         self.channel = channel
 
     def compile(self):
         k = [];
-        [k.append(i) for i in (self.attachments + self.reply + self.channel) if i not in k]
+        [k.append(i) for i in (self.attachments + self.channel) if i not in k]
         return k
 
 
@@ -114,8 +113,9 @@ async def get_targets(msg, attachments=True, reply=True, channel=True, message_s
         if reply and msg.reference: msg_reply = (await msg.channel.fetch_message(msg.reference.message_id)).attachments
         if stop_on_first and msg_reply: return
 
-        if channel and message_search_count > 0: msg_channel = reduce(add, [i.attachments async for i in msg.channel.history(
-                                                                                limit=message_search_count)])
+        if channel and message_search_count > 0: msg_channel = reduce(add,
+                                                                      [i.attachments async for i in msg.channel.history(
+                                                                          limit=message_search_count)])
 
     await do_setters()
 
@@ -193,35 +193,15 @@ def process_result_post(msg, res, filename="video.mp4", prefix=None, random_mess
 async def parse_command(message):
     if message.author.id == bot.user.id and not '║' in message.content:
         return
-
     msg = message.content.split('║', 1)[0]
     if len(msg) == 0: return
 
     is_reply_to_bot = message.reference and (
         await message.channel.fetch_message(message.reference.message_id)).author.id == bot.user.id
-
     if message.author.id != bot.user.id and not is_reply_to_bot and msg.split('>>')[0].removeprefix('!').strip() == "":
         return
 
-    has_meta_prefix = is_reply_to_bot
-    append_space = ' ' if ' ' in msg else ''
-    for pre in meta_prefixes:
-        if msg.startswith(pre + append_space):
-            has_meta_prefix = True
-            msg = msg.removeprefix(pre).lstrip()
-            break
-
-    cmd_name_opts = ["destroy:"]
-
     command, *remainder = msg.split(">>")
-    if command.startswith('!'):
-        command = command.removeprefix('!')
-
-    remainder = clean_message('>>'.join(remainder)).strip()
-
-    if len(remainder) and not any(remainder.removeprefix('!').startswith(i) for i in cmd_name_opts):
-        remainder = f"destroy: {remainder}"
-
     spl = command.strip().split(' ', 1)
     cmd = spl[0].strip().lower()
     args = spl[1].strip() if len(spl) > 1 else ""
@@ -235,14 +215,13 @@ async def parse_command(message):
         final_command_name = "help"
     elif cmd == "hat":
         final_command_name = "hat"
-    elif (ev1 := (cmd in ["destroy:", ""])) or has_meta_prefix:
+    elif ev1 := (cmd in ["destroy:", ""]):
         final_command_name = "destroy:"
         if not ev1 or cmd == "":
             args = f"{cmd} {args}"
 
     if not final_command_name:
         return
-
 
     match final_command_name:
         case "help":
