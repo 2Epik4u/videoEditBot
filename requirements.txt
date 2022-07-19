@@ -6,3 +6,5 @@ psutil
 Pillow
 yt-dlp
 pydub
+requests
+sox

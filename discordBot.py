@@ -31,11 +31,6 @@ cookie_file = config["cookie_file"] if "cookie_file" in config else None
 valid_video_extensions = ["mp4", "webm", "avi", "mkv", "mov"]
 valid_image_extensions = ["png", "gif", "jpg", "jpeg"]
 valid_extensions = valid_video_extensions + valid_image_extensions
-
-
-
-
-
 qued_msg = namedtuple("qued_msg", "context message filepath filename reply edit", defaults=6 * [None])
 result = namedtuple("result", "success filename message", defaults=3 * [None])
 
