@@ -328,13 +328,6 @@ botReady = False
 async def on_ready():
     global botReady, meta_prefixes
     if botReady: pass
-
-    meta_prefixes += [
-        f"<@{bot.user.id}>",
-        f"<@!{bot.user.id}>",
-        f"<@&{bot.user.id}>",
-        f"<@#{bot.user.id}>",
-    ]
     if not os.path.isdir(working_directory):
         os.makedirs(working_directory)
 
